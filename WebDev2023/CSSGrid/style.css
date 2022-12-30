@@ -98,9 +98,32 @@
 
 .container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 2fr; /* Use fr 100% of the time for grid because it handles all gaps and is responsive */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Use fr 100% of the time for grid because it handles all gaps and is responsive */
     /* You can also the repeat(number of times to repeat, fr size) instead of manually entering the frs */
     /* auto - it will fit the content size and resize the column or row */
+    /* repeat(auto-fill, size) - it will automatically handle the rows and columns based on the size. This makes the css grid VERY reactive */ 
     grid-template-rows: 1fr;
     gap: 1rem;
+    
+    /** 
+        justifies the content in each cell
+     */
+    justify-items: stretch;
+}
+
+/* We can control individual cells as well*/
+.green {
+    /* This will make the green 2 "cells" */
+    /* grid-column-start: 1;  start at the starting of the green cell */
+    /* grid-column-end: 3; /* end at the starting of the next cell */
+    
+    /* we can also create a short hand */
+    /* grid-column: 1/-1; /* If we want the cell to go from start to end we can say 1/-1 */
+    grid-column: span 2; /* we can also tell it to span a length **/
+    /* we can do the same with rows */
+    
+    grid-row: span 2;
+    
+    /* We can also align single content */
+    align-self: center;
 }
