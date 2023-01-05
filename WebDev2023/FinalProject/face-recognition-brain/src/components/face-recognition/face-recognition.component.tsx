@@ -1,6 +1,6 @@
 import './face-recognition.styles.css';
 import { Box } from '../../interfaces/clarifai.interface';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 
 const FaceRecognition = (props: { image: string; boundingBox?: Box }) => {
   const [imageStatus, setImageStatus] = useState<
@@ -9,9 +9,8 @@ const FaceRecognition = (props: { image: string; boundingBox?: Box }) => {
 
   // reset the image state when image url changes
   useEffect(() => {
-    setImageStatus('loading')
+    setImageStatus('loading');
   }, [props.image]);
-
 
   return (
     <div className="center ma">

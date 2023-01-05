@@ -1,5 +1,5 @@
-import "./image-ling.styles.css";
-import { Dispatch, FormEvent, SetStateAction } from "react";
+import './image-ling.styles.css';
+import { Dispatch, FormEvent, SetStateAction } from 'react';
 
 const ImageLinkForm = (props: {
   handleInputChange: Dispatch<SetStateAction<string>>;
@@ -17,7 +17,7 @@ const ImageLinkForm = (props: {
 
   return (
     <div>
-      <p className="white f3">{"This Magic Brain Will Detect Faces"}</p>
+      <p className="white f3">{'This Magic Brain Will Detect Faces'}</p>
       <div className="center">
         <div className="form center pa4 br3 shadow-5">
           <input

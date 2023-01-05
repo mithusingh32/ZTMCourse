@@ -1,14 +1,10 @@
-const Rank = () => {
-    return (
-        <div>
-            <div className="white f3">
-                Your Current Rank Is...
-            </div>
-            <div className="white f1">
-                #5
-            </div>
-        </div>
-    )
-}
+const Rank = (props: {rank?: number}) => {
+  return (
+    <div>
+      <div className="white f3">You have used this app...</div>
+      <div className="white f1">{`${props.rank} times.`}</div>
+    </div>
+  );
+};
 
 export default Rank;
