@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 
+const dbUtils = require('./utils/database-utils');
+
 // Constants
 const SALT_ROUNDS = 10;
 
@@ -30,18 +32,19 @@ const database = {
     {
       id: 1,
       email: 'john@john.com',
-      password: '$2b$10$IF5uhDvXaUql1ezsSK6dlek9giY0EbtVXVzcXZ2olrnh7RbmDKTr.'
+      password: '$2b$10$IF5uhDvXaUql1ezsSK6dlek9giY0EbtVXVzcXZ2olrnh7RbmDKTr.',
     },
     {
       id: 2,
       email: 'sally@john.com',
-      password: '$2b$10$Wo7Q9E6dJ2q3xBAUCVtyguL3QfjNoJFEld5AQ5zmD6oeo8m0kRdhO'
-    }
+      password: '$2b$10$Wo7Q9E6dJ2q3xBAUCVtyguL3QfjNoJFEld5AQ5zmD6oeo8m0kRdhO',
+    },
   ],
 };
 
 // App Setup
 const app = express();
+
 
 // Middleware Setup
 app.use(bodyParser.json());
@@ -53,8 +56,8 @@ function incrementEntries(id, res) {
     for (let i = 0; i < database.users.length; i++) {
       if (database.users[i].id === id) {
         database.users[i].entries++;
-        const {email, name, id, entries, joined} = database.users[i]
-        return res.status(200).json({email, name, id, entries, joined});
+        const { email, name, id, entries, joined } = database.users[i];
+        return res.status(200).json({ email, name, id, entries, joined });
       }
     }
     res.status(404).json(`User not found`);
@@ -62,7 +65,6 @@ function incrementEntries(id, res) {
     res.status(500).json(`Error updating entries`);
   }
 }
-
 
 // Routes
 app.get('/', (req, res) => {
@@ -76,7 +78,7 @@ app.get('/', (req, res) => {
  * If we can't find the user, it fails
  */
 app.post('/signin', (req, res) => {
-  console.log(req.body)
+  console.log(req.body);
   const { email, password } = req.body;
   if (email && password) {
     // Get the user and login from the database
@@ -85,7 +87,6 @@ app.post('/signin', (req, res) => {
     );
     const login = database.login.filter((login) => login.email === email);
     if (user.length === 1 && login.length === 1) {
-
       bcrypt.compare(password, login[0].password, (err, result) => {
         const userData = {
           id: user[0].id,
@@ -93,8 +94,8 @@ app.post('/signin', (req, res) => {
           email: user[0].email,
           entries: user[0].entries,
           joined: user[0].joined,
-        }
-        if (result) return res.status(200).json({status: 'success', user: userData});
+        };
+        if (result) return res.status(200).json({ status: 'success', user: userData });
         else return res.status(500).json('fail');
       });
     }
@@ -108,32 +109,19 @@ app.post('/signin', (req, res) => {
  * Creates a new user and adds it to the database
  */
 app.post('/register', (req, res) => {
-  console.log(req.body);
   if (req.body && req.body.email && req.body.password && req.body.name) {
-    for (let i = 0; i < database.users; i++) {
-      if (database.users[i] === req.body.email) {
-        return res.status(418).json('email already exists');
-      }
-    }
     bcrypt.hash(req.body.password, SALT_ROUNDS, (err, hash) => {
       if (err) console.log(err);
       else {
         const newUser = {
-          id: count++,
           name: req.body.name,
           email: req.body.email,
-          password: req.body.password,
           entries: 0,
           joined: new Date(),
         };
-        const login = {
-          id: newUser.id,
-          password: hash,
-          email: newUser.email,
-        };
-        database.login.push(login);
-        database.users.push(newUser);
-        return res.status(202).json(newUser);
+        dbUtils.insertNewUserIntoDatabase(newUser, hash, res);
+
+        //duplicate key value violates unique constraint
       }
     });
   } else {
@@ -147,7 +135,6 @@ app.post('/register', (req, res) => {
  * Gets the user profile from the id provoded as params
  */
 app.get('/profile/:id', (req, res) => {
-  console.log(req.params);
   if (req.params && req.params.id) {
     const user = database.users.filter((x) => x.id === parseInt(req.params.id));
     if (user.length === 1) {
