@@ -23,31 +23,58 @@ const insertNewUserIntoDatabase = (newUser, hash, resp) => {
     await trx('user')
       .insert(newUser)
       .returning('*')
-      .then( async (id) => {
+      .then(async (id) => {
         // insert password hash into db w/ the serial generated ID
         const login = {
           id: id[0].id, // This is the ID from db
-          password: hash,
+          hash: hash,
           email: newUser.email,
         };
         await trx('login').insert(login);
       });
   })
-    .then(result => resp.status(202).json({status: result, user: newUser}))
-    .catch(err => resp.status(500).json({status: 'error', error_code: err.code}));
+    .then((result) => resp.status(201).json({ status: result, user: newUser }))
+    .catch((err) => resp.status(500).json({ status: 'error', error_code: err.code }));
 };
 
+/**
+ * Returns user and login entries for an email address
+ * @param email email address
+ */
 const getUserFromEmail = (email) => {
-  return pg('user')
-    .where({ email: email })
-    .select('*')
-    .then((resp) => {
-      console.log('getUser', resp);
-      return resp.length >= 1;
-    });
+  return pg('user').join('login', 'user.id', 'login.id').select('*').where({
+    'user.email': email,
+  });
+};
+
+/**
+ * Increments the entry for the id-email paur
+ * @param id - user id
+ * @param email - user email
+ * @param resp - response object
+ */
+const incrementEntries = (id, email, resp) => {
+  let updatedUser;
+  pg.transaction(async (trx) => {
+    await trx('user')
+      .where({
+        id,
+        email,
+      })
+      .update({
+        entries: pg.raw('entries + 1'),
+      })
+      .returning('*')
+      .then((result) => {
+        updatedUser = result[0];
+      });
+  })
+    .then((result) => resp.status(200).json({ status: result, user: updatedUser }))
+    .catch((err) => resp.status(500).json({ status: 'error', error_code: err.code }));
 };
 
 module.exports = {
   insertNewUserIntoDatabase,
   getUserFromEmail,
+  incrementEntries
 };

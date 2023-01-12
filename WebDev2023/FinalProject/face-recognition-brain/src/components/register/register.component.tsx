@@ -1,38 +1,55 @@
 import Logo from '../logo/logo.component';
 import { SyntheticEvent, useState } from 'react';
+import validator from 'validator';
 
 const Register = (props: { onRouteChange: (route: string) => void }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+
+
+  const validatePassword = (value: string) => {
+    if (validator.isStrongPassword(value, {
+      minLength: 8, minLowercase: 1,
+      minUppercase: 1, minNumbers: 1, minSymbols: 1
+    })) {
+      setPasswordError(false);
+      setPassword(value);
+    } else {
+      setPasswordError(true)
+    }
+  }
 
   const handleFormSubmit = (event: SyntheticEvent) => {
-    event.preventDefault();
-    const postData = {
-      name,
-      email,
-      password,
-    };
-    console.log(postData);
-    fetch('http://localhost:3000/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(postData),
-    })
-      .then((resp) => resp.json())
-      .then((json) => {
-        console.log('register status', json);
-        props.onRouteChange('home');
-      });
+    if (!passwordError) {
+      event.preventDefault();
+      const postData = {
+        name,
+        email,
+        password,
+      };
+      fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      })
+        .then((resp) => resp.json())
+        .then((json) => {
+          console.log('register status', json);
+          props.onRouteChange('home');
+        });
+    }
   };
+
   return (
     <>
       <Logo className="center" />
       <article className="br3 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center bg-dark-blue">
         <main className="pa4 black-80">
-          <form className="measure" onSubmit={handleFormSubmit}>
+          <form className="measure white" onSubmit={handleFormSubmit}>
             <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
               <legend className="f1 fw6 ph0 mh0 center">Register</legend>
               <div className="mt3">
@@ -67,13 +84,14 @@ const Register = (props: { onRouteChange: (route: string) => void }) => {
                   type="password"
                   name="password"
                   id="password"
-                  onChange={(event) => setPassword(event.target.value)}
+                  onChange={(event) => validatePassword(event.target.value)}
                 />
+                {passwordError ? <div className='red pt2'>{'Weak Password'}</div> : <></>}
               </div>
             </fieldset>
-            <div className="">
+            <div>
               <input
-                className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
+                className=" b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib white"
                 type="submit"
                 value="Register"
               />

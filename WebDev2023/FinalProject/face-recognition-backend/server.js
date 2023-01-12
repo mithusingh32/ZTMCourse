@@ -3,67 +3,23 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 
+// Utils
 const dbUtils = require('./utils/database-utils');
 
-// Constants
-const SALT_ROUNDS = 10;
+// Controllers
+const { signIn, register, getProfileFromId} = require('./controllers/controllers');
 
-let count = 1;
-const database = {
-  users: [
-    {
-      id: count++,
-      name: 'john',
-      email: 'john@john.com',
-      password: 'cookies',
-      entries: 0,
-      joined: new Date(),
-    },
-    {
-      id: count++,
-      name: 'sally',
-      email: 'sally@john.com',
-      password: 'bananas',
-      entries: 0,
-      joined: new Date(),
-    },
-  ],
-  login: [
-    {
-      id: 1,
-      email: 'john@john.com',
-      password: '$2b$10$IF5uhDvXaUql1ezsSK6dlek9giY0EbtVXVzcXZ2olrnh7RbmDKTr.',
-    },
-    {
-      id: 2,
-      email: 'sally@john.com',
-      password: '$2b$10$Wo7Q9E6dJ2q3xBAUCVtyguL3QfjNoJFEld5AQ5zmD6oeo8m0kRdhO',
-    },
-  ],
-};
 
 // App Setup
 const app = express();
-
 
 // Middleware Setup
 app.use(bodyParser.json());
 app.use(cors());
 
 // Helper Functions
-function incrementEntries(id, res) {
-  if (id) {
-    for (let i = 0; i < database.users.length; i++) {
-      if (database.users[i].id === id) {
-        database.users[i].entries++;
-        const { email, name, id, entries, joined } = database.users[i];
-        return res.status(200).json({ email, name, id, entries, joined });
-      }
-    }
-    res.status(404).json(`User not found`);
-  } else {
-    res.status(500).json(`Error updating entries`);
-  }
+function incrementEntries(id, email, res) {
+  dbUtils.incrementEntries(id, email, res);
 }
 
 // Routes
@@ -78,29 +34,7 @@ app.get('/', (req, res) => {
  * If we can't find the user, it fails
  */
 app.post('/signin', (req, res) => {
-  console.log(req.body);
-  const { email, password } = req.body;
-  if (email && password) {
-    // Get the user and login from the database
-    const user = database.users.filter(
-      (x) => x.email === req.body.email && x.password === req.body.password,
-    );
-    const login = database.login.filter((login) => login.email === email);
-    if (user.length === 1 && login.length === 1) {
-      bcrypt.compare(password, login[0].password, (err, result) => {
-        const userData = {
-          id: user[0].id,
-          name: user[0].name,
-          email: user[0].email,
-          entries: user[0].entries,
-          joined: user[0].joined,
-        };
-        if (result) return res.status(200).json({ status: 'success', user: userData });
-        else return res.status(500).json('fail');
-      });
-    }
-  }
-  return 'sign in complete';
+  return signIn(req, res, dbUtils, bcrypt);
 });
 
 /**
@@ -109,44 +43,16 @@ app.post('/signin', (req, res) => {
  * Creates a new user and adds it to the database
  */
 app.post('/register', (req, res) => {
-  if (req.body && req.body.email && req.body.password && req.body.name) {
-    bcrypt.hash(req.body.password, SALT_ROUNDS, (err, hash) => {
-      if (err) console.log(err);
-      else {
-        const newUser = {
-          name: req.body.name,
-          email: req.body.email,
-          entries: 0,
-          joined: new Date(),
-        };
-        dbUtils.insertNewUserIntoDatabase(newUser, hash, res);
-
-        //duplicate key value violates unique constraint
-      }
-    });
-  } else {
-    res.status(412).json('Missing information');
-  }
+  return register(req, res, SALT_ROUNDS, dbUtils, bcrypt);
 });
 
 /**
  * GET Profile Endpoint
  *
- * Gets the user profile from the id provoded as params
+ * Gets the user profile from the id provided as params
  */
 app.get('/profile/:id', (req, res) => {
-  if (req.params && req.params.id) {
-    const user = database.users.filter((x) => x.id === parseInt(req.params.id));
-    if (user.length === 1) {
-      res.status(200).json(user);
-    } else if (user.length > 1) {
-      res.status(500).json('more than 1 user found.');
-    } else {
-      res.status(404).json('user does not exist');
-    }
-  } else {
-    res.status(500).json('could not get users');
-  }
+  return getProfileFromId(req, res, null, null);
 });
 
 /**
@@ -155,8 +61,8 @@ app.get('/profile/:id', (req, res) => {
  * Update the images processed
  */
 app.patch('/image', (req, res) => {
-  const { id } = req.body;
-  return incrementEntries(id, res);
+  const { id, email } = req.body;
+  return incrementEntries(id, email, res);
 });
 
 /**
@@ -165,9 +71,8 @@ app.patch('/image', (req, res) => {
  * Update the images processed
  */
 app.put('/image', (req, res) => {
-  const { id } = req.body;
-  incrementEntries(id, res);
-  return res.status(404).json('could not find user');
+  const { id, email } = req.body;
+  incrementEntries(id, email, res);
 });
 
 /* Routes/API:
