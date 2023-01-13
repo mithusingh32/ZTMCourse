@@ -2,13 +2,18 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
+const { SALT_ROUNDS } = require('./utils/constants');
 
 // Utils
 const dbUtils = require('./utils/database-utils');
 
 // Controllers
-const { signIn, register, getProfileFromId} = require('./controllers/controllers');
-
+const {
+  signIn,
+  register,
+  getProfileFromId,
+  getFaceBoundBox,
+} = require('./controllers/controllers');
 
 // App Setup
 const app = express();
@@ -65,21 +70,16 @@ app.patch('/image', (req, res) => {
   return incrementEntries(id, email, res);
 });
 
-/**
- * PUT Image Endpoint
- *
- * Update the images processed
- */
-app.put('/image', (req, res) => {
-  const { id, email } = req.body;
-  incrementEntries(id, email, res);
+app.post('/image', (req, res) => {
+  const { id, email, url } = req.body;
+  return getFaceBoundBox(id, email, url, res);
 });
 
 /* Routes/API:
      - /signin   POST = success/fail
      - /register POST = return created user
      - /profile/:userId  GET  = returns profile of user
-     - /image PATCH/PUT = returns the updated user
+     - /image POST = returns the updated user
      */
 
 app.listen(3000, () => {

@@ -51,11 +51,10 @@ const getUserFromEmail = (email) => {
  * Increments the entry for the id-email paur
  * @param id - user id
  * @param email - user email
- * @param resp - response object
  */
-const incrementEntries = (id, email, resp) => {
+const incrementEntries = (id, email) => {
   let updatedUser;
-  pg.transaction(async (trx) => {
+  return pg.transaction(async (trx) => {
     await trx('user')
       .where({
         id,
@@ -69,8 +68,15 @@ const incrementEntries = (id, email, resp) => {
         updatedUser = result[0];
       });
   })
-    .then((result) => resp.status(200).json({ status: result, user: updatedUser }))
-    .catch((err) => resp.status(500).json({ status: 'error', error_code: err.code }));
+    .then((result) => {
+      return { status: result, user: updatedUser };
+    })
+    .catch((err) => {
+      return {
+        status: 'error',
+        error_code: err.code,
+      };
+    });
 };
 
 module.exports = {
