@@ -2,7 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
-const { SALT_ROUNDS } = require('./utils/constants');
+
+// dotenv
+require('dotenv').config()
 
 // Utils
 const dbUtils = require('./utils/database-utils');
@@ -21,11 +23,6 @@ const app = express();
 // Middleware Setup
 app.use(bodyParser.json());
 app.use(cors());
-
-// Helper Functions
-function incrementEntries(id, email, res) {
-  dbUtils.incrementEntries(id, email, res);
-}
 
 // Routes
 app.get('/', (req, res) => {
@@ -48,7 +45,7 @@ app.post('/signin', (req, res) => {
  * Creates a new user and adds it to the database
  */
 app.post('/register', (req, res) => {
-  return register(req, res, SALT_ROUNDS, dbUtils, bcrypt);
+  return register(req, res, process.env.SALT_ROUNDS, dbUtils, bcrypt);
 });
 
 /**
@@ -60,27 +57,10 @@ app.get('/profile/:id', (req, res) => {
   return getProfileFromId(req, res, null, null);
 });
 
-/**
- * PATCH Image Endpoint
- *
- * Update the images processed
- */
-app.patch('/image', (req, res) => {
-  const { id, email } = req.body;
-  return incrementEntries(id, email, res);
-});
-
 app.post('/image', (req, res) => {
   const { id, email, url } = req.body;
   return getFaceBoundBox(id, email, url, res);
 });
-
-/* Routes/API:
-     - /signin   POST = success/fail
-     - /register POST = return created user
-     - /profile/:userId  GET  = returns profile of user
-     - /image POST = returns the updated user
-     */
 
 app.listen(3000, () => {
   console.log('Server started on port ' + 3000);

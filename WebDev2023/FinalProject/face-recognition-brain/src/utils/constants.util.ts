@@ -1,1 +1,0 @@
-export const CLARIFAI_API_KEY = '4623b51b02d94e13ad49e107a0402c8e';

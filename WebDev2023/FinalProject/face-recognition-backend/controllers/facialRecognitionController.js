@@ -1,11 +1,10 @@
 const { ClarifaiStub, grpc } = require('clarifai-nodejs-grpc');
 const dbUtils = require("../utils/database-utils");
-const {CLARIFAI_API_KEY} = require("../utils/constants");
 
 // stub for clarifai
 const stub = ClarifaiStub.grpc();
 const metadata = new grpc.Metadata();
-metadata.set('authorization', `Key ${CLARIFAI_API_KEY}`);
+metadata.set('authorization', `Key ${process.env.CLARIFAI_API_KEY}`);
 
 const getFaceBoundBox = (id, email, url, res) => {
   const clarifaiOpts = {
