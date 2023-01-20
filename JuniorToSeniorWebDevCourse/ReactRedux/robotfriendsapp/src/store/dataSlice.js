@@ -6,7 +6,7 @@ const initialState = {
 };
 
 export const fetchData = createAsyncThunk("data/getData", async (thunkAPI) => {
-  console.log('fetchData')
+  console.log("fetchData");
   return await fetch("https://jsonplaceholder.typicode.com/users")
     .then((resp) => resp.json())
     .then((json) => json);

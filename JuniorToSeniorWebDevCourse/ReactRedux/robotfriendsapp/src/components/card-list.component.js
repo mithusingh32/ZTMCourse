@@ -1,5 +1,6 @@
 import Card from "./card.component";
 import { connect } from "react-redux";
+
 const CardList = ({ data, searchFilter }) => {
   const cardArray = data
     .filter((dt) => {
@@ -13,11 +14,7 @@ const CardList = ({ data, searchFilter }) => {
         <Card id={rob.id} name={rob.name} email={rob.email} key={rob.id} />
       );
     });
-  return (
-    <div>
-      {cardArray}
-    </div>
-  );
+  return <div>{cardArray}</div>;
 };
 
 const mapStateToProps = (state) => {
