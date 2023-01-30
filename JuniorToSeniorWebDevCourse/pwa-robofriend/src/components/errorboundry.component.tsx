@@ -1,4 +1,4 @@
-import { Component, ErrorInfo } from 'react';
+import {Component, ErrorInfo} from 'react';
 
 interface ErrorState {
   hasError: boolean;
@@ -6,6 +6,7 @@ interface ErrorState {
 
 interface ErrorProp {
   children: JSX.Element;
+  msg?: string;
 }
 
 // Error Boundaries must be a class component
@@ -23,7 +24,7 @@ class ErrorBoundary extends Component<ErrorProp, ErrorState> {
 
   render() {
     if (this.state.hasError) {
-      return <h1>Error Loading Data</h1>;
+      return this.props.msg ? <h1>{this.props.msg}</h1> : <h1>Error Loading Data</h1>;
     } else {
       return this.props.children;
     }
