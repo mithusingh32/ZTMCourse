@@ -5,16 +5,18 @@ import './index.css';
 // @ts-ignore
 import { registerSW } from 'virtual:pwa-register';
 import { Provider } from 'react-redux';
-import { store } from './store/store';
+import { setupStore } from './store/store';
 
 const updateSW = registerSW({
   onOfflineReady() {},
 });
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+const appStore = await setupStore();
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <Provider store={store}>
+    <Provider store={appStore}>
       <App />
     </Provider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

@@ -7,10 +7,12 @@ const initialState: DataState = {
 };
 
 export const fetchData = createAsyncThunk('data/getData', async (_) => {
-  console.log('fetchData');
   return await fetch('https://jsonplaceholder.typicode.com/users')
     .then((resp) => resp.json())
-    .then((json) => json);
+    .then((json) => {
+      console.log(json)
+      return json;
+    });
 });
 
 export const dataSlice = createSlice({
