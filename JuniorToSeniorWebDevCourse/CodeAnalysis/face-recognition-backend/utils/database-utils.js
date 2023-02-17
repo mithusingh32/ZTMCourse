@@ -1,4 +1,3 @@
-const sqlite3 = require('sqlite3').verbose();
 const knex = require('knex');
 // const pg = knex({
 //   client: 'pg',
@@ -19,7 +18,7 @@ const sqlite = knex({
     filename: './db.sqlite'
   },
   useNullAsDefault: true,
-  debug: true
+  // debug: true
 });
 
 const createDbAndTable = () => {
@@ -28,8 +27,8 @@ const createDbAndTable = () => {
   sqlite.schema.hasTable('user').then((exists) => {
     if (!exists) {
       console.log('building tables');
-      buildUserTable().then(msg => console.log).catch(e => console.log);
-      buildLoginTable().then(msg => console.log).catch(e => console.log);
+      buildUserTable();
+      buildLoginTable();
     }
   });
 

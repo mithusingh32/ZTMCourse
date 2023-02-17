@@ -16,12 +16,12 @@ import { User } from './interfaces/auth.interface';
 const App = () => {
   const [input, setInput] = useState('');
   const [user, setUser] = useState<User>();
-  const [boundingBox, setBoundingBox] = useState<Box>();
+  const [boundingBox, setBoundingBox] = useState<Box[]>([]);
   const [route, setRoute] = useState('signin');
 
   // Reset boundingBox when url changes
   useEffect(() => {
-    setBoundingBox(undefined);
+    setBoundingBox([]);
   }, [input]);
 
   /**
@@ -60,21 +60,26 @@ const App = () => {
    */
   const calculateFaceLocation = (resp: ClarifaiResponse) => {
     if (resp && resp.outputs) {
-      const face = resp.outputs[0].data.regions[0].region_info.bounding_box;
+      // const face = resp.outputs[0].data.regions[0].region_info.bounding_box;
+      const faces = resp.outputs[0].data.regions;
       const image = document.getElementById('inputImage');
-      if (image) {
-        const width = image.clientWidth;
-        const height = image.clientHeight;
-        const box = {
-          leftCol: face.left_col * width,
-          topRow: face.top_row * height,
-          rightCol: width - face.right_col * width,
-          bottomRow: height - face.bottom_row * height,
-        };
-        console.log('box', box);
-        // We need to calculate the box we need to create from the % provided by Clarifai
-        setBoundingBox(box);
-      }
+
+      // Get Bounding box for each face
+      faces.forEach((fc) => {
+        const face = fc.region_info.bounding_box;
+        if (image) {
+          const width = image.clientWidth;
+          const height = image.clientHeight;
+          const box = {
+            leftCol: face.left_col * width,
+            topRow: face.top_row * height,
+            rightCol: width - face.right_col * width,
+            bottomRow: height - face.bottom_row * height,
+          };
+          // We need to calculate the box we need to create from the % provided by Clarifai
+          setBoundingBox((oldState) => [...oldState, box]);
+        }
+      });
     }
   };
 

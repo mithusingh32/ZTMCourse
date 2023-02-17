@@ -2,7 +2,7 @@ import './face-recognition.styles.css';
 import { Box } from '../../interfaces/clarifai.interface';
 import { useEffect, useState } from 'react';
 
-const FaceRecognition = (props: { image: string; boundingBox?: Box }) => {
+const FaceRecognition = (props: { image: string; boundingBox?: Box[] }) => {
   const [imageStatus, setImageStatus] = useState<
     'no image' | 'loading' | 'error' | 'loaded'
   >('no image');
@@ -11,6 +11,21 @@ const FaceRecognition = (props: { image: string; boundingBox?: Box }) => {
   useEffect(() => {
     setImageStatus('loading');
   }, [props.image]);
+
+  const getFaceBoxes = (boundBoxes: Box[]) => {
+    return boundBoxes.map(boundingBox => (
+      <div
+        key={boundingBox.topRow}
+        className="bounding-box"
+        style={{
+          top: boundingBox.topRow,
+          right: boundingBox.rightCol,
+          bottom: boundingBox.bottomRow,
+          left: boundingBox.leftCol,
+        }}
+      ></div>
+    ))
+  }
 
   return (
     <div className="center ma">
@@ -34,15 +49,7 @@ const FaceRecognition = (props: { image: string; boundingBox?: Box }) => {
               <p className="red f4 pa7">Error Loading Image</p>
             )}
             {props.boundingBox !== undefined ? (
-              <div
-                className="bounding-box"
-                style={{
-                  top: props.boundingBox.topRow,
-                  right: props.boundingBox.rightCol,
-                  bottom: props.boundingBox.bottomRow,
-                  left: props.boundingBox.leftCol,
-                }}
-              ></div>
+              getFaceBoxes(props.boundingBox)
             ) : (
               <></>
             )}

@@ -27,7 +27,6 @@ const SignIn = (props: {
     })
       .then((resp) => resp.json())
       .then((json: SignInResponse) => {
-        console.log('sign in', json);
         if (json.status === 'success') {
           props.onSignIn(json.user);
           props.onRouteChange('home');
