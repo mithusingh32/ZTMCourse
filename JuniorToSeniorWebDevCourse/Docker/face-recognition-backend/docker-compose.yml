@@ -1,0 +1,12 @@
+version: '3.6'
+
+services:
+  smartbrain-backend:
+    container_name: backend
+    #image node:18-alpine - not needed since it's already in the Dockerfile
+    build: ./ # Run the Image Build Steps
+    command: npm start
+    working_dir: /app
+    ports:
+      - "3000:3000" # Binds ports to localhost. Make sure you pass in the --service-ports flag when running docker compose run
+
