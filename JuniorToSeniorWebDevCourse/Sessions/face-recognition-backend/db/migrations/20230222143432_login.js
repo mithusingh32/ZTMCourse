@@ -1,0 +1,21 @@
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.up = function(knex) {
+  return knex.schema.createTable('login', t => {
+    t.increments('id').primary();
+    t.foreign('id').references('user.id')
+    t.text('email').primary().unique().notNullable();
+    t.foreign('email').references('user.email');
+    t.string('hash', 100);
+  })
+};
+
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.down = function(knex) {
+  return knex.schema.dropTable('login');
+};

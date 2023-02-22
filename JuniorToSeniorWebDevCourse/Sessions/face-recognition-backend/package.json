@@ -1,0 +1,29 @@
+{
+  "name": "face-recognition-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "knex migrate:latest --knexfile ./db/knexfile.js",
+    "seed": "knex seed:run --knexfile db/knexfile.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.1",
+    "clarifai": "^2.9.1",
+    "clarifai-nodejs-grpc": "^8.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "knex": "^2.4.0",
+    "nodemon": "^2.0.20",
+    "pg": "^8.8.0",
+    "sqlite3": "^5.1.4"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.3"
+  }
+}
