@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'tachyons';
 // @ts-ignore
 import Clarifai from 'clarifai';
 import ParticlesBg from 'particles-bg';
@@ -13,13 +11,14 @@ import { Box, ClarifaiResponse } from './interfaces/clarifai.interface';
 import SignIn from './components/sign-in/sign-in.component';
 import Register from './components/register/register.component';
 import { User } from './interfaces/auth.interface';
+import Modal from "./components/modal /modal.component";
 
 
 const App = () => {
   const [input, setInput] = useState('');
   const [user, setUser] = useState<User>();
   const [boundingBox, setBoundingBox] = useState<Box[]>([]);
-  const [route, setRoute] = useState('signin');
+  const [route, setRoute] = useState('home');
 
   // Reset boundingBox when url changes
   useEffect(() => {
@@ -96,6 +95,9 @@ const App = () => {
   };
   return (
     <div className="App">
+      <Modal>
+        <div>Hi</div>
+      </Modal>
       <ParticlesBg bg={true} type={'cobweb'} color="#ffffff" />
       {route === 'home' ? (
         <div className="wrapper">
