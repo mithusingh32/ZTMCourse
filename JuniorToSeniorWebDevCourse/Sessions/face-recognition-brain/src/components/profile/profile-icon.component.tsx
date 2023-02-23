@@ -1,11 +1,14 @@
-import {useState} from "react";
+import {useContext, useState} from "react";
 import {Dropdown, DropdownItem, DropdownMenu, DropdownToggle} from "reactstrap";
 import {User} from "../../interfaces/auth.interface";
+import {AppStore} from "../../context/appStore";
 
 const ProfileIcon = (props: {
   handleSignOut: (user: User | undefined) => void;
 }) => {
   const [dropDownOpen, setDropDownOpen] = useState(false);
+
+  const context= useContext(AppStore);
 
   return (
     <Dropdown isOpen={dropDownOpen} toggle={() => setDropDownOpen(s => !s)} direction={'down'}>
@@ -16,7 +19,9 @@ const ProfileIcon = (props: {
         </div>
       </DropdownToggle>
       <DropdownMenu>
-        <DropdownItem>View Profile</DropdownItem>
+        <DropdownItem onClick={() => {
+          context.setIsProfileOpen(s => !s);
+        }}>View Profile</DropdownItem>
         <DropdownItem onClick={() => props.handleSignOut(undefined)}>Sign Out</DropdownItem>
       </DropdownMenu>
     </Dropdown>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useContext, useEffect, useState} from 'react';
 import './App.css';
 // @ts-ignore
 import Clarifai from 'clarifai';
@@ -7,29 +7,34 @@ import Navigation from './components/navigation/navigation.component';
 import ImageLinkForm from './components/image-link-form/image-link.form';
 import Rank from './components/rank/rank.component';
 import FaceRecognition from './components/face-recognition/face-recognition.component';
-import { Box, ClarifaiResponse } from './interfaces/clarifai.interface';
+import {Box, ClarifaiResponse} from './interfaces/clarifai.interface';
 import SignIn from './components/sign-in/sign-in.component';
 import Register from './components/register/register.component';
-import { User } from './interfaces/auth.interface';
+import {User} from './interfaces/auth.interface';
 import Modal from "./components/modal /modal.component";
+import {AppStore} from "./context/appStore";
 
 
 const App = () => {
+  const {isProfileOpen} = useContext(AppStore);
+
   const [input, setInput] = useState('');
   const [user, setUser] = useState<User>();
   const [boundingBox, setBoundingBox] = useState<Box[]>([]);
   const [route, setRoute] = useState('home');
+  // const [isProfileOpen, setIsProfileOpen] = useState(false)
+
 
   // Reset boundingBox when url changes
   useEffect(() => {
     setBoundingBox([]);
+    console.log(isProfileOpen);
   }, [input]);
 
   /**
    * Loads the user into the app
    */
   const loadUser = (user: User) => {
-    console.log(user)
     setUser(user);
   };
 
@@ -38,20 +43,19 @@ const App = () => {
    */
   const detectFace = () => {
     if (input && input !== '') {
-      console.log(user)
       if (user) {
         fetch('http://localhost:3000/image', {
           method: 'POST', // or 'PUT'
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email: user.email, id: user.id, url: input }),
+          body: JSON.stringify({email: user.email, id: user.id, url: input}),
         })
           .then((resp) => resp.json())
           .then((json) => {
             const user = json.user;
             calculateFaceLocation(json.api);
-            setUser({ ...user, entries: user.entries });
+            setUser({...user, entries: user.entries});
           });
       }
     }
@@ -94,22 +98,25 @@ const App = () => {
     setRoute(route);
   };
   return (
+
     <div className="App">
+      {isProfileOpen &&
       <Modal>
-        <div>Hi</div>
+        <div>Hello</div>
       </Modal>
-      <ParticlesBg bg={true} type={'cobweb'} color="#ffffff" />
+      }
+      <ParticlesBg bg={true} type={'cobweb'} color="#ffffff"/>
       {route === 'home' ? (
         <div className="wrapper">
           <div className={`test ${route === 'home' ? 'test1' : ''}`}>
-            <Navigation onRouteChange={onRouteChange} handleSignOut={setUser} />
-            <Rank rank={user?.entries} />
-            <ImageLinkForm handleInputChange={setInput} detectFace={detectFace} />
-            <FaceRecognition image={input} boundingBox={boundingBox} />
+            <Navigation onRouteChange={onRouteChange} handleSignOut={setUser} setIsProfileOpen={() => {}}/>
+            <Rank rank={user?.entries}/>
+            <ImageLinkForm handleInputChange={setInput} detectFace={detectFace}/>
+            <FaceRecognition image={input} boundingBox={boundingBox}/>
           </div>
         </div>
       ) : route === 'signin' ? (
-        <SignIn onRouteChange={onRouteChange} onSignIn={loadUser} />
+        <SignIn onRouteChange={onRouteChange} onSignIn={loadUser}/>
       ) : (
         <Register onRouteChange={onRouteChange} newUser={setUser}/>
       )}

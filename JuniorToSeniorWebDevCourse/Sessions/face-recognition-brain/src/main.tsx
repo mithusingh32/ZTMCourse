@@ -5,9 +5,12 @@ import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'tachyons';
 import './index.css';
+import AppProvider from "./context/appStore";
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <AppProvider>
+      <App />
+    </AppProvider>
   </React.StrictMode>,
 );
