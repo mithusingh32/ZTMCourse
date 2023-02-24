@@ -30,7 +30,7 @@ export const validateReEntryOfPassword = (
   setPasswordReEntryError: Dispatch<SetStateAction<boolean>>,
 ) => {
   console.log(password2)
-  if (password2 == '') setPasswordReEntryError(false)
+  if (password2 == '' || password1 === password2) setPasswordReEntryError(false)
   else setPasswordReEntryError(true)
   setReEntryPassword(password2);
 };

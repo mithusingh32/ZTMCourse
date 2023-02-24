@@ -13,23 +13,26 @@ const insertNewUserIntoDatabase = (newUser, hash, resp) => {
   // transaction lets us do multiple/complex queries in a single 'transaction'
   // but it only 'complete' the query if all the queries succeed.
   let entries = 0;
-  sqlite.transaction(async (trx) => {
-    await trx('user')
-      .insert(newUser)
-      .returning('*')
-      .then(async (id) => {
-        // insert password hash into db w/ the serial generated ID
-        const login = {
-          id: id[0].id, // This is the ID from db
-          hash: hash,
-          email: newUser.email,
-        };
-        await trx('login').insert(login);
-        console.log(id[0])
-        entries = id[0].entries;
-      });
-  })
-    .then((result) => resp.status(201).json({ status: result, user: {...newUser, entries} }))
+  sqlite
+    .transaction(async (trx) => {
+      await trx('user')
+        .insert(newUser)
+        .returning('*')
+        .then(async (id) => {
+          // insert password hash into db w/ the serial generated ID
+          const login = {
+            id: id[0].id, // This is the ID from db
+            hash: hash,
+            email: newUser.email,
+          };
+          await trx('login').insert(login);
+          console.log(id[0]);
+          entries = id[0].entries;
+        });
+    })
+    .then((result) =>
+      resp.status(201).json({ status: result, user: { ...newUser, entries } }),
+    )
     .catch((err) => resp.status(500).json({ status: 'error', error_code: err }));
 };
 
@@ -40,7 +43,7 @@ const insertNewUserIntoDatabase = (newUser, hash, resp) => {
 const getUserFromEmail = (email) => {
   console.log(email);
   return sqlite('user').join('login', 'user.id', 'login.id').select('*').where({
-    'user.email': email
+    'user.email': email,
   });
 };
 
@@ -51,20 +54,21 @@ const getUserFromEmail = (email) => {
  */
 const incrementEntries = (id, email) => {
   let updatedUser;
-  return sqlite.transaction(async (trx) => {
-    await trx('user')
-      .where({
-        id,
-        email,
-      })
-      .update({
-        entries: sqlite.raw('entries + 1'),
-      })
-      .returning('*')
-      .then((result) => {
-        updatedUser = result[0];
-      });
-  })
+  return sqlite
+    .transaction(async (trx) => {
+      await trx('user')
+        .where({
+          id,
+          email,
+        })
+        .update({
+          entries: sqlite.raw('entries + 1'),
+        })
+        .returning('*')
+        .then((result) => {
+          updatedUser = result[0];
+        });
+    })
     .then((result) => {
       return { status: result, user: updatedUser };
     })
@@ -76,8 +80,33 @@ const incrementEntries = (id, email) => {
     });
 };
 
+const updateUserProfile = (id, email, newHashedPassword) => {
+  let result;
+  return sqlite
+    .transaction(async (trx) => {
+      const newUser = { id };
+      if (email) newUser.email = email;
+      await trx('user')
+        .where({ id })
+        .update(newUser)
+        .returning('*')
+        .then(async (res) => {
+          await trx('login').where({ id: res[0].id }).update({ email, hash: newHashedPassword });
+          result = res[0];
+        })
+        .catch((err) => {
+          result = err;
+        });
+    })
+    .then((_) => {
+      return { ...result };
+    })
+    .catch((_) => console.log);
+};
+
 module.exports = {
   insertNewUserIntoDatabase,
   getUserFromEmail,
   incrementEntries,
+  updateUserProfile,
 };

@@ -1,17 +1,38 @@
-import { useState } from 'react';
+import { FormEvent, useContext, useState } from 'react';
 import {
   validatePassword,
   validateReEntryOfPassword,
 } from '../../util/form-validator.utils';
+import { AppStore } from '../../context/appStore';
 
 const UpdateInfoForm = () => {
+  const { user, setUser } = useContext(AppStore);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [reEntryPassword, setReEntryPassword] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [passwordReEntryError, setPasswordReEntryError] = useState(false);
 
-  const handleUserInfoUpdate = () => {};
+  const handleUserInfoUpdate = (e: FormEvent) => {
+    e.preventDefault();
+    if (!passwordError && !passwordReEntryError) {
+      fetch(`http://localhost:3000/profile/${user?.id}`, {
+        method: 'POST', // or 'PUT'
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: user?.id,
+          email,
+          newPassword: reEntryPassword,
+        }),
+      })
+        .then((resp) => resp.json())
+        .then((res) => setUser(res))
+        .catch((_) => console.log);
+    }
+  };
 
   return (
     <form onSubmit={handleUserInfoUpdate} method="get" acceptCharset="utf-8">
@@ -72,9 +93,10 @@ const UpdateInfoForm = () => {
       </fieldset>
       <div className="mt3">
         <input
-          className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6"
+          className={`b ph3 pv2 input-reset ba b--black bg-transparent pointer grow f6`}
           type="submit"
-          value="update"
+          value="Update"
+          disabled={passwordError && passwordReEntryError}
         />
       </div>
     </form>

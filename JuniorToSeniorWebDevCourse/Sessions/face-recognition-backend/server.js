@@ -66,8 +66,8 @@ app.get('/profile/:id', (req, res) => {
 /**
  * POST Profile Endpoint
  */
-app.get('/profile/:id', (req, res) => {
-  return updateUserProfile(req, res);
+app.post('/profile/:id', (req, res) => {
+  return updateUserProfile(req, res, process.env.SALT_ROUNDS, dbUtils, bcrypt);
 });
 
 app.post('/image', (req, res) => {
