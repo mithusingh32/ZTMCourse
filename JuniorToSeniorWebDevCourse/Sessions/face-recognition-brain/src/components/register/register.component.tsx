@@ -1,29 +1,20 @@
 import Logo from '../logo/logo.component';
-import {Dispatch, SetStateAction, SyntheticEvent, useState} from 'react';
-import validator from 'validator';
-import {User} from "../../interfaces/auth.interface";
+import { Dispatch, SetStateAction, SyntheticEvent, useState } from 'react';
+import { User } from '../../interfaces/auth.interface';
+import { validatePassword } from '../../util/form-validator.utils';
 
 const Register = (props: {
-  onRouteChange: (route: string) => void,
-  newUser:Dispatch<SetStateAction<User | undefined>>
+  onRouteChange: (route: string) => void;
+  newUser: Dispatch<SetStateAction<User | undefined>>;
 }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState(false);
 
-
-  const validatePassword = (value: string) => {
-    if (validator.isStrongPassword(value, {
-      minLength: 8, minLowercase: 1,
-      minUppercase: 1, minNumbers: 1, minSymbols: 1
-    })) {
-      setPasswordError(false);
-      setPassword(value);
-    } else {
-      setPasswordError(true)
-    }
-  }
+  const validateRegPassword = (value: string) => {
+    validatePassword(value, setPasswordError, setPassword);
+  };
 
   const handleFormSubmit = (event: SyntheticEvent) => {
     if (!passwordError) {
@@ -50,7 +41,7 @@ const Register = (props: {
 
   return (
     <>
-      <Logo className="center"/>
+      <Logo className="center" />
       <article className="br3 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center bg-dark-blue">
         <main className="pa4 black-80">
           <form className="measure white" onSubmit={handleFormSubmit}>
@@ -88,9 +79,9 @@ const Register = (props: {
                   type="password"
                   name="password"
                   id="password"
-                  onChange={(event) => validatePassword(event.target.value)}
+                  onChange={(event) => validateRegPassword(event.target.value)}
                 />
-                {passwordError ? <div className='red pt2'>{'Weak Password'}</div> : <></>}
+                {passwordError ? <div className="red pt2">{'Weak Password'}</div> : <></>}
               </div>
             </fieldset>
             <div>

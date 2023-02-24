@@ -1,5 +1,13 @@
 #modal-root {
-  position: relative;
-  z-index: 999;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /*z-index: 999;*/
+}
 
+.disable-bg {
+  z-index: 1;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
 }
