@@ -1,12 +1,10 @@
 import Logo from '../logo/logo.component';
-import { Dispatch, SetStateAction, SyntheticEvent, useState } from 'react';
-import { User } from '../../interfaces/auth.interface';
+import { SyntheticEvent, useContext, useState } from 'react';
 import { validatePassword } from '../../util/form-validator.utils';
+import { AppStore } from '../../context/appStore';
 
-const Register = (props: {
-  onRouteChange: (route: string) => void;
-  newUser: Dispatch<SetStateAction<User | undefined>>;
-}) => {
+const Register = (props: { onRouteChange: (route: string) => void }) => {
+  const { setUser } = useContext(AppStore);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,7 +31,7 @@ const Register = (props: {
       })
         .then((resp) => resp.json())
         .then((json) => {
-          props.newUser(json.user);
+          setUser(json.user);
           props.onRouteChange('home');
         });
     }

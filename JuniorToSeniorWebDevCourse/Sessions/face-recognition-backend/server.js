@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 
 // dotenv
-require('dotenv').config()
+require('dotenv').config();
 
 // Utils
 const dbUtils = require('./db/database-utils');
@@ -16,15 +16,18 @@ const {
   getProfileFromId,
   getFaceBoundBox,
 } = require('./controllers/controllers');
+const { updateUserProfile } = require('./controllers/profileController');
 
 // App Setup
 const app = express();
 
 // Middleware Setup
 app.use(bodyParser.json());
-app.use(cors({
-  origin: 'http://localhost:5173'
-}));
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+  }),
+);
 
 // Routes
 app.get('/', (req, res) => {
@@ -56,7 +59,15 @@ app.post('/register', (req, res) => {
  * Gets the user profile from the id provided as params
  */
 app.get('/profile/:id', (req, res) => {
-  return getProfileFromId(req, res, null, null);
+  console.log('profiel');
+  return getProfileFromId(req, res);
+});
+
+/**
+ * POST Profile Endpoint
+ */
+app.get('/profile/:id', (req, res) => {
+  return updateUserProfile(req, res);
 });
 
 app.post('/image', (req, res) => {

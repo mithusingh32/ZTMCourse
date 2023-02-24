@@ -1,11 +1,23 @@
 import { User } from '../../interfaces/auth.interface';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { AppStore } from '../../context/appStore';
 import UpdateInfoForm from './update-user-info.component';
 import './profile.css';
 
 const Profile = ({ user }: { user?: User }) => {
-  const { setIsProfileOpen } = useContext(AppStore);
+  const { isProfileOpen, setIsProfileOpen } = useContext(AppStore);
+
+  const handleEscapeKey = (e: KeyboardEvent) => {
+    if (e.key == 'Escape') setIsProfileOpen(false);
+  };
+
+  useEffect(() => {
+    console.log(isProfileOpen);
+    if (isProfileOpen) {
+      window.addEventListener('keydown', handleEscapeKey);
+    }
+    return () => window.removeEventListener('keydown', handleEscapeKey);
+  }, [isProfileOpen]);
 
   return (
     <article

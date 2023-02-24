@@ -1,6 +1,7 @@
 import Logo from '../logo/logo.component';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useContext, useState } from 'react';
 import { User } from '../../interfaces/auth.interface';
+import { AppStore } from '../../context/appStore';
 
 interface SignInResponse {
   status: string;
@@ -9,8 +10,9 @@ interface SignInResponse {
 
 const SignIn = (props: {
   onRouteChange: (route: string) => void;
-  onSignIn: (user: User) => void;
 }) => {
+  const { setUser } = useContext(AppStore);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
@@ -28,7 +30,7 @@ const SignIn = (props: {
       .then((resp) => resp.json())
       .then((json: SignInResponse) => {
         if (json.status === 'success') {
-          props.onSignIn(json.user);
+          setUser(json.user);
           props.onRouteChange('home');
         } else {
           setError(true);

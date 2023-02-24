@@ -10,31 +10,22 @@ import FaceRecognition from './components/face-recognition/face-recognition.comp
 import { Box, ClarifaiResponse } from './interfaces/clarifai.interface';
 import SignIn from './components/sign-in/sign-in.component';
 import Register from './components/register/register.component';
-import { User } from './interfaces/auth.interface';
 import Modal from './components/modal /modal.component';
 import { AppStore } from './context/appStore';
 import Profile from './components/profile/profile.component';
 
 const App = () => {
-  const { isProfileOpen } = useContext(AppStore);
+  const { isProfileOpen, user, setUser } = useContext(AppStore);
 
   const [input, setInput] = useState('');
-  const [user, setUser] = useState<User>();
   const [boundingBox, setBoundingBox] = useState<Box[]>([]);
-  const [route, setRoute] = useState('home');
+  const [route, setRoute] = useState('signin');
   // const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   // Reset boundingBox when url changes
   useEffect(() => {
     setBoundingBox([]);
   }, [input]);
-
-  /**
-   * Loads the user into the app
-   */
-  const loadUser = (user: User) => {
-    setUser(user);
-  };
 
   /**
    * Calls the Clarrifai end point for detecting faces
@@ -119,9 +110,9 @@ const App = () => {
             </div>
           </div>
         ) : route === 'signin' ? (
-          <SignIn onRouteChange={onRouteChange} onSignIn={loadUser} />
+          <SignIn onRouteChange={onRouteChange} />
         ) : (
-          <Register onRouteChange={onRouteChange} newUser={setUser} />
+          <Register onRouteChange={onRouteChange} />
         )}
       </div>
     </>
