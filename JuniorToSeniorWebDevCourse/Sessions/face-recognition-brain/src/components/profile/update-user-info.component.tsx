@@ -13,6 +13,7 @@ const UpdateInfoForm = () => {
   const [reEntryPassword, setReEntryPassword] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [passwordReEntryError, setPasswordReEntryError] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState<boolean | undefined>(undefined);
 
   const handleUserInfoUpdate = (e: FormEvent) => {
     e.preventDefault();
@@ -29,13 +30,21 @@ const UpdateInfoForm = () => {
         }),
       })
         .then((resp) => resp.json())
-        .then((res) => setUser(res))
-        .catch((_) => console.log);
+        .then((res) => {
+          setUser(res);
+          setUpdateSuccess(true);
+        })
+        .catch((_) => setUpdateSuccess(false));
     }
   };
 
   return (
     <form onSubmit={handleUserInfoUpdate} method="get" acceptCharset="utf-8">
+      {updateSuccess ? (
+        <h5 className={'pt4 green'}>User information has been updated</h5>
+      ) : updateSuccess == undefined ? null : (
+        <h5 className={'pt4 red'}>Could not update user information</h5>
+      )}
       <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
         <legend className="ph0 mh0 fw6 clip">Sign Up</legend>
         <div className="mt3">
@@ -92,11 +101,15 @@ const UpdateInfoForm = () => {
         </div>
       </fieldset>
       <div className="mt3">
+        {/* TODO - Have user enter current password after clicking update*/}
         <input
           className={`b ph3 pv2 input-reset ba b--black bg-transparent pointer grow f6`}
           type="submit"
           value="Update"
-          disabled={passwordError && passwordReEntryError}
+          disabled={
+            (passwordError && passwordReEntryError) ||
+            (password == '' && reEntryPassword == '')
+          }
         />
       </div>
     </form>
