@@ -1,25 +1,42 @@
 version: '3.6'
 
 services:
-  smartbrain-backend:
+  backend-api:
     container_name: backend
     #image node:18-alpine - not needed since it's already in the Dockerfile
     build: ./ # Run the Image Build Steps
     command: npm start
+    environment:
+      POSTGRES_URI: postgres://admin:secret@postgres:5432/smartbrain
+      REDIS_URI: redis://redis:6379
     working_dir: /app
 #    links: # This will link the containers. HOWEVER this is no longer needed. Depecrated
 #      - postgres
     ports:
       - "3000:3000" # Binds container ports to localhost. Make sure you pass in the --service-ports flag when running docker compose
     volumes: # this allows access to the file system in the container
-      - .:/app # we're mapping our directory to the working directory in the container
-      - /app/node_modules # Need to explicitly map node_modules as well
-#  postgres:
+      - ./:/app # we're mapping our directory to the working directory in the container
+      - /app/node_modules
+    healthcheck:
+      test: npm run migrate && npm run seed
+      interval: 30s
+      timeout: 10s
+      retries: 2
+  postgres:
+    container_name: postgres
+#    We're going to let knex build the tables
 #    build: ./postgres
-#    enviornment: # sets the evn variables for the docker
-#      POSTGRES_USER: admin
-#      POSTGRES_PASSWORD: secret
-#      POSTGRES_DB: smartbrain
-#      POSTGRES_HOST: postgres
-#    ports:
-#      - 5432:5432
+    image: postgres
+    environment: # sets the evn variables for the docker
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: smartbrain
+      POSTGRES_HOST: postgres
+      POSTGRES_URL: postgres://admin:secret@localhot:5432/smartbrain
+    ports:
+      - "5432:5432"
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"

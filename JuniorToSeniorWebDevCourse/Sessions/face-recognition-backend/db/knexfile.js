@@ -1,15 +1,12 @@
 const path = require("path");
 module.exports = {
-  client: 'sqlite3',
-  connection: {
-    filename:path.join(__dirname, 'db.sqlite3')
-  },
-  useNullAsDefault: true,
+  client: 'pg',
+  connection: process.env.POSTGRES_URI,
   migrations: {
     directory: path.join(__dirname, 'migrations')
   },
   seed: {
     directory: path.join(__dirname, 'seeds')
   },
-  // debug: true
+  debug: true
 }

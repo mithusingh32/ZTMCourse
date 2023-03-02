@@ -4,6 +4,7 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
+    "prestart": "npm run migrate && npm run seed",
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate": "knex migrate:latest --knexfile ./db/knexfile.js",
     "seed": "knex seed:run --knexfile db/knexfile.js"

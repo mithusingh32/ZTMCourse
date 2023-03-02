@@ -1,7 +1,10 @@
 const knex = require('knex');
 const knexConfig = require('./knexfile');
 
-const sqlite = knex(knexConfig);
+// const sqlite = knex(knexConfig);
+const db = knex(knexConfig);
+
+console.log(process.env.POSTGRES_URI)
 
 /**
  * Inserts a new user into the database
@@ -13,7 +16,7 @@ const insertNewUserIntoDatabase = (newUser, hash, resp) => {
   // transaction lets us do multiple/complex queries in a single 'transaction'
   // but it only 'complete' the query if all the queries succeed.
   let entries = 0;
-  sqlite
+  db
     .transaction(async (trx) => {
       await trx('user')
         .insert(newUser)
@@ -42,7 +45,7 @@ const insertNewUserIntoDatabase = (newUser, hash, resp) => {
  */
 const getUserFromEmail = (email) => {
   console.log(email);
-  return sqlite('user').join('login', 'user.id', 'login.id').select('*').where({
+  return db('user').join('login', 'user.id', 'login.id').select('*').where({
     'user.email': email,
   });
 };
@@ -54,7 +57,7 @@ const getUserFromEmail = (email) => {
  */
 const incrementEntries = (id, email) => {
   let updatedUser;
-  return sqlite
+  return db
     .transaction(async (trx) => {
       await trx('user')
         .where({
@@ -62,7 +65,7 @@ const incrementEntries = (id, email) => {
           email,
         })
         .update({
-          entries: sqlite.raw('entries + 1'),
+          entries: db.raw('entries + 1'),
         })
         .returning('*')
         .then((result) => {
@@ -82,7 +85,7 @@ const incrementEntries = (id, email) => {
 
 const updateUserProfile = (id, email, newHashedPassword) => {
   let result;
-  return sqlite
+  return db
     .transaction(async (trx) => {
       const newUser = { id };
       if (email) newUser.email = email;
