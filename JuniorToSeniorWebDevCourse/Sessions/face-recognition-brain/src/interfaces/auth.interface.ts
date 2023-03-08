@@ -4,4 +4,6 @@ export interface User {
   email: string;
   entries: number;
   joined: Date;
+
+  token: String;
 }

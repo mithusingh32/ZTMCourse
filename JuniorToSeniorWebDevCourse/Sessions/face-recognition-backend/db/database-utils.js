@@ -44,9 +44,24 @@ const insertNewUserIntoDatabase = (newUser, hash, resp) => {
  * @param email email address
  */
 const getUserFromEmail = (email) => {
-  console.log(email);
   return db('user').join('login', 'user.id', 'login.id').select('*').where({
     'user.email': email,
+  });
+};
+
+/**
+ * Returns user and login entries for an email address
+ * @param id id of user
+ */
+const getUserFromId = (id) => {
+  return db('user').join('login', 'user.id', 'login.id').select(
+    'user.id',
+    'user.name',
+    'user.email',
+    'user.entries',
+    'user.joined'
+  ).where({
+    'user.id': id,
   });
 };
 
@@ -112,4 +127,5 @@ module.exports = {
   getUserFromEmail,
   incrementEntries,
   updateUserProfile,
+  getUserFromId
 };

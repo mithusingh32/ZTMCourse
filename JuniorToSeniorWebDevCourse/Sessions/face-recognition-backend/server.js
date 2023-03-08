@@ -11,12 +11,12 @@ const dbUtils = require('./db/database-utils');
 
 // Controllers
 const {
-  signIn,
   register,
   getProfileFromId,
   getFaceBoundBox,
 } = require('./controllers/controllers');
 const { updateUserProfile } = require('./controllers/profileController');
+const {handleSignIn} = require("./controllers/signinController");
 
 // App Setup
 const app = express();
@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
  * If we can't find the user, it fails
  */
 app.post('/signin', (req, res) => {
-  return signIn(req, res, dbUtils, bcrypt);
+  return handleSignIn(req, res, dbUtils, bcrypt);
 });
 
 /**
@@ -60,7 +60,7 @@ app.post('/register', (req, res) => {
  */
 app.get('/profile/:id', (req, res) => {
   console.log('profiel');
-  return getProfileFromId(req, res);
+  return getProfileFromId(req, res, dbUtils);
 });
 
 /**

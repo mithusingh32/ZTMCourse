@@ -9,6 +9,7 @@ services:
     environment:
       POSTGRES_URI: postgres://admin:secret@postgres:5432/smartbrain
       REDIS_URI: redis://redis:6379
+      JWT_SECRET: superdupersecret1239
     working_dir: /app
 #    links: # This will link the containers. HOWEVER this is no longer needed. Depecrated
 #      - postgres
@@ -16,7 +17,7 @@ services:
       - "3000:3000" # Binds container ports to localhost. Make sure you pass in the --service-ports flag when running docker compose
     volumes: # this allows access to the file system in the container
       - ./:/app # we're mapping our directory to the working directory in the container
-      - /app/node_modules
+#      - /app/node_modules
     healthcheck:
       test: npm run migrate && npm run seed
       interval: 30s

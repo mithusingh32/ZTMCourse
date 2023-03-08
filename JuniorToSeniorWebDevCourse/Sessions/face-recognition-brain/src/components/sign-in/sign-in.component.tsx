@@ -6,6 +6,7 @@ import { AppStore } from '../../context/appStore';
 interface SignInResponse {
   status: string;
   user: User;
+  token: string;
 }
 
 const SignIn = (props: {
@@ -16,6 +17,12 @@ const SignIn = (props: {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
+
+  const saveAuth = (token: string, user: User) => {
+    // localStorage for longer sessions (As long as the browser is open)
+    window.sessionStorage.setItem('token', token); // This is per tab
+    setUser({...user, token});
+  }
 
   const handleSignIn = (event: SyntheticEvent) => {
     event.preventDefault();
@@ -30,7 +37,7 @@ const SignIn = (props: {
       .then((resp) => resp.json())
       .then((json: SignInResponse) => {
         if (json.status === 'success') {
-          setUser(json.user);
+          saveAuth(json.token, json.user);
           props.onRouteChange('home');
         } else {
           setError(true);
