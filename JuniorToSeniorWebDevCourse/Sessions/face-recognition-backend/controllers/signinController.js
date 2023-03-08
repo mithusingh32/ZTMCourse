@@ -1,16 +1,6 @@
 const jwt = require('jsonwebtoken');
-const redis = require('redis');
 
-const redisClient = redis.createClient({
-  url: 'redis://redis:6379',
-  legacyMode: true
-});
-
-async function redisConnect() {
-  return await redisClient.connect();
-}
-
-redisConnect()
+const {redisClient} = require("../db/redis-utils");
 
 /**
  * Main logic for handling signing in and creating sessions (JWT token)

@@ -14,12 +14,18 @@ const {
   register,
   getProfileFromId,
   getFaceBoundBox,
+  handleSignIn,
+  updateUserProfile
 } = require('./controllers/controllers');
-const { updateUserProfile } = require('./controllers/profileController');
-const {handleSignIn} = require("./controllers/signinController");
+
+const {
+  requireAuth
+} = require('./middleware/authorization')
+
 
 // App Setup
 const app = express();
+
 
 // Middleware Setup
 app.use(bodyParser.json());
@@ -58,8 +64,7 @@ app.post('/register', (req, res) => {
  *
  * Gets the user profile from the id provided as params
  */
-app.get('/profile/:id', (req, res) => {
-  console.log('profiel');
+app.get('/profile/:id', requireAuth, (req, res) => {
   return getProfileFromId(req, res, dbUtils);
 });
 
@@ -70,7 +75,7 @@ app.post('/profile/:id', (req, res) => {
   return updateUserProfile(req, res, process.env.SALT_ROUNDS, dbUtils, bcrypt);
 });
 
-app.post('/image', (req, res) => {
+app.post('/image', requireAuth, (req, res) => {
   const { id, email, url } = req.body;
   return getFaceBoundBox(id, email, url, res);
 });

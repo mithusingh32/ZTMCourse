@@ -22,6 +22,7 @@ const UpdateInfoForm = () => {
         method: 'POST', // or 'PUT'
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`
         },
         body: JSON.stringify({
           id: user?.id,
@@ -32,6 +33,7 @@ const UpdateInfoForm = () => {
         .then((resp) => resp.json())
         .then((res) => {
           setUser(res);
+          window.sessionStorage.setItem('token', res.token);
           setUpdateSuccess(true);
         })
         .catch((_) => setUpdateSuccess(false));

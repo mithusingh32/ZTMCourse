@@ -16,6 +16,7 @@ const getFaceBoundBox = (id, email, url, res) => {
     metadata,
     (err, response) => {
       if (err) {
+        console.log('err')
         return res.status(501).json({
           error: err.code,
           message: err.message
@@ -23,7 +24,7 @@ const getFaceBoundBox = (id, email, url, res) => {
       }
 
       if (response.status.code !== 10000) {
-        return res.status(502).json(response)
+        return res.status(500).json(response)
       }
 
       dbUtils.incrementEntries(id, email)

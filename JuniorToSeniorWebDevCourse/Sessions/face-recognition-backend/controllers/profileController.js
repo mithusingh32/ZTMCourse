@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken')
+const {redisClient} = require('../db/redis-utils');
 /**
  * Retrieve user from ID
  * @param req - Request
@@ -29,7 +31,12 @@ const updateUserProfile = (req, res, SALT_ROUNDS, dbUtils, bcrypt) => {
   else
     bcrypt.hash(newPassword, parseInt(SALT_ROUNDS), (err, hash) => {
       dbUtils.updateUserProfile(id, email, hash).then((user) => {
-        return res.status(200).send(user);
+        const token = jwt.sign({id: user.id, email: user.email}, process.env.JWT_SECRET);
+        console.log("token", token)
+        console.log('id', id)
+        redisClient.set(token, user.id);
+        console.log(redisClient.get(token))
+        return res.status(200).send({...user, });
       });
     });
 };

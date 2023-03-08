@@ -1,10 +1,11 @@
-const { signIn } = require('./signinController');
-const { register } = require('./registerController');
-const { getProfileFromId } = require('./profileController');
-const { getFaceBoundBox } = require('./facialRecognitionController');
+const {handleSignIn} = require('./signinController');
+const {register} = require('./registerController');
+const {getProfileFromId, updateUserProfile} = require('./profileController');
+const {getFaceBoundBox} = require('./facialRecognitionController');
 module.exports = {
-  signIn,
+  handleSignIn,
   register,
   getProfileFromId,
   getFaceBoundBox,
+  updateUserProfile
 };
