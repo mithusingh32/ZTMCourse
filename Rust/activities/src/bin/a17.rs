@@ -12,4 +12,11 @@
 //   to uppercase and lowercase
 //   * Try searching for: to_uppercase, to_lowercase
 
-fn main() {}
+fn main() {
+    let mut str = "Potato".to_owned();
+    str = str.to_lowercase();
+    println!("{str}");
+    str = str.to_uppercase();
+
+    println!("{str}");
+}
