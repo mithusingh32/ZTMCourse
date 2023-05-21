@@ -23,4 +23,53 @@
 // * The program should be case-insensitive (the user should be able to type
 //   Reboot, reboot, REBOOT, etc.)
 
-fn main() {}
+use std::io;
+
+enum State {
+    Off,
+    Sleep,
+    Reboot,
+    Shutdown,
+    Hibernate,
+}
+
+fn get_input() -> io::Result<String> {
+    let mut buffer = String::new();
+    io::stdin().read_line(&mut buffer)?;
+    Ok(buffer.trim().to_lowercase().to_owned())
+}
+
+fn get_state_output(state: State) {
+    match state {
+        State::Off => println!("Powering Off"),
+        State::Sleep => println!("Going to sleep"),
+        State::Reboot => println!("Rebotting now, please wait.....Reboot Complete"),
+        State::Shutdown => println!("Shutting down now"),
+        State::Hibernate => println!("Hibernatting now"),
+    }
+}
+
+fn process_input(input: &str) {
+    let state = match input {
+        "off" => Some(State::Off),
+        "sleep" => Some(State::Sleep),
+        "reboot" => Some(State::Reboot),
+        "shutdown" => Some(State::Shutdown),
+        "hibernate" => Some(State::Hibernate),
+        _ => None,
+    };
+
+    if state.is_none() {
+        println!("Command is not supported")
+    } else {
+        get_state_output(state.unwrap())
+    }
+}
+
+fn main() {
+    println!("Enter command: ");
+    match get_input() {
+        Ok(word) => process_input(&word),
+        Err(e) => println!("Error reading input {}", e),
+    }
+}
