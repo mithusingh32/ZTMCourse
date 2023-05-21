@@ -32,3 +32,57 @@ fn concat(first: &str, second: &str) -> String {
 }
 
 fn main() {}
+
+#[cfg(test)]
+mod test {
+    use crate::*;
+    #[test]
+    fn test_clamp_lower() {
+        let lower = 5;
+        let higher = 10;
+        let expected = 5;
+        let actual = clamp(2, lower, higher);
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_clamp_higher() {
+        let lower = 5;
+        let higher = 10;
+        let expected = 10;
+        let actual = clamp(15, lower, higher);
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_clamp_n() {
+        let lower = 5;
+        let higher = 10;
+        let expected = 7;
+        let actual = clamp(7, lower, higher);
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_div_some() {
+        let a = 10;
+        let b = 5;
+        let expected = 2;
+        let actual = div(a, b).unwrap();
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_concat_1() {
+        let expected = "Hello World".to_owned();
+        let actual = concat("Hello", "World");
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_concat_2() {
+        let expected = "Hello World!".to_owned();
+        let actual = concat("Hello", "World!");
+        assert_eq!(expected, actual);
+    }
+}
