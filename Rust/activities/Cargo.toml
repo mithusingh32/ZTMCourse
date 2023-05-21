@@ -7,3 +7,7 @@ edition = "2018"
 
 [dependencies]
 chrono = "0.4.24"
+
+[lib]
+name = "activities"
+path = "src/lib/mod.rs"
