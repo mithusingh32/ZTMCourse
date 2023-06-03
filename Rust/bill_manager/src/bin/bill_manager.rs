@@ -1,5 +1,5 @@
 use bill_manager::enums::Action;
-use rusqlite::{params, Connection, Error};
+use rusqlite::{Connection, Error};
 use std::{io, process::exit};
 
 fn print_menu() {
@@ -28,7 +28,7 @@ fn databaste_connection() -> Result<Connection, Error> {
 fn main() {
     let db = match databaste_connection() {
         Ok(conn) => {
-            println!("Successfully connected to db\n\n");
+            println!("Successfully connected to db");
             conn
         }
         Err(e) => {
