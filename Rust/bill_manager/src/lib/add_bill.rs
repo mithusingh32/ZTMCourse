@@ -1,45 +1,35 @@
 use crate::bill::Bill;
 use rusqlite::{params, Connection};
+use std::io;
 
-pub fn add_prompt() {
-    // TODO
+pub fn add_prompt() -> io::Result<Bill> {
+    let mut name_buffer = String::new();
+    let mut total_buffer = String::new();
+    let mut category_buffer = String::new();
+
+    println!("Adding bill, please fill out the following: ");
+    println!("Name: ");
+    io::stdin().read_line(&mut name_buffer)?;
+    println!("Total: ");
+    io::stdin().read_line(&mut total_buffer)?;
+    println!("Category: ");
+    io::stdin().read_line(&mut category_buffer)?;
+
+    let new_bill = Bill {
+        id: None,
+        name: name_buffer.trim().to_owned(),
+        total: total_buffer.trim().parse().unwrap(),
+        category: Some(category_buffer.trim().to_owned()),
+    };
+
+    Ok(new_bill)
 }
 
 pub fn add_bill(conn: &Connection, bill: Bill) -> bool {
-    let val_name: String;
-    let val_parameters: String;
-
-    match &bill {
-        Bill {
-            id: None,
-            name,
-            category,
-            total,
-        } => {
-            val_name = "name, category, total".to_owned();
-            val_parameters = "=?1, =?2, =?3".to_owned();
-        }
-        Bill {
-            id: None,
-            category: None,
-            name,
-            total,
-        } => {
-            val_name = "name, total".to_owned();
-            val_parameters = "=?1, =?2".to_owned();
-        }
-        Bill { .. } => {
-            val_name = "".to_owned();
-            val_parameters = "".to_owned();
-        }
-    };
-
-    let query = format!(
-        "INSERT INTO bills ({}) VALUES ({})",
-        val_name, val_parameters
-    );
-
-    match conn.execute(query.as_str(), params![]) {
+    match conn.execute(
+        "INSERT INTO bills (name, total, category) VALUES (?1, ?2, ?3)",
+        (&bill.name, &bill.total, &bill.category),
+    ) {
         Ok(_) => {
             println!("Bill added sucessfully");
             true

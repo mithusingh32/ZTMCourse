@@ -1,3 +1,5 @@
+use bill_manager::add_bill::{add_bill_to_db, add_prompt};
+use bill_manager::db_utils::create_table;
 use bill_manager::enums::Action;
 use rusqlite::{Connection, Error};
 use std::{io, process::exit};
@@ -25,6 +27,12 @@ fn databaste_connection() -> Result<Connection, Error> {
     Connection::open(path)
 }
 
+fn add_bill(conn: &Connection) {
+    if let Ok(bill) = add_prompt() {
+        add_bill_to_db(conn, bill);
+    }
+}
+
 fn main() {
     let db = match databaste_connection() {
         Ok(conn) => {
@@ -37,6 +45,9 @@ fn main() {
             exit(2);
         }
     };
+
+    // TODO - Only run create tables if they dont exist 
+    match create_table(&db);
 
     loop {
         print_menu();
@@ -62,7 +73,7 @@ fn main() {
         print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
 
         match action {
-            Action::Add => println!("Adding Bill"),
+            Action::Add => add_bill(&db),
             Action::View => println!("View Bill"),
             Action::Remove => println!("Removing Bill"),
             Action::Update => println!("Upating bill"),
