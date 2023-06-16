@@ -1,4 +1,5 @@
 use bill_manager::add_bill::add_bill;
+use bill_manager::bill::view_bills;
 use bill_manager::db_utils::{create_table, database_connection};
 use bill_manager::enums::Action;
 use bill_manager::utils::get_input;
@@ -61,7 +62,7 @@ fn main() {
 
         match action {
             Action::Add => add_bill(&db),
-            Action::View => println!("View Bill"),
+            Action::View => view_bills(&db),
             Action::Remove => println!("Removing Bill"),
             Action::Update => println!("Upating bill"),
             Action::Total => println!("Totalling bills"),
