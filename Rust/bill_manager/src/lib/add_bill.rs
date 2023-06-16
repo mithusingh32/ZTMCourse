@@ -1,5 +1,5 @@
 use crate::bill::Bill;
-use rusqlite::{params, Connection};
+use rusqlite::Connection;
 use std::io;
 
 pub fn add_prompt() -> io::Result<Bill> {
@@ -7,12 +7,34 @@ pub fn add_prompt() -> io::Result<Bill> {
     let mut total_buffer = String::new();
     let mut category_buffer = String::new();
 
-    println!("Adding bill, please fill out the following: ");
-    println!("Name: ");
-    io::stdin().read_line(&mut name_buffer)?;
-    println!("Total: ");
-    io::stdin().read_line(&mut total_buffer)?;
-    println!("Category: ");
+    println!("==========================================");
+    println!("Adding bill, please fill out the following");
+    println!("==========================================");
+    loop {
+        println!("Name: ");
+        io::stdin().read_line(&mut name_buffer)?;
+        match name_buffer.trim() {
+            "" => {
+                println!("Name cannot be empty");
+                continue;
+            }
+            _ => break,
+        }
+    }
+
+    loop {
+        println!("\nTotal: ");
+        io::stdin().read_line(&mut total_buffer)?;
+        match total_buffer.trim() {
+            "" => {
+                println!("Name cannot be empty");
+                continue;
+            }
+            _ => break,
+        }
+    }
+
+    println!("\nCategory: ");
     io::stdin().read_line(&mut category_buffer)?;
 
     let new_bill = Bill {
@@ -25,7 +47,7 @@ pub fn add_prompt() -> io::Result<Bill> {
     Ok(new_bill)
 }
 
-pub fn add_bill(conn: &Connection, bill: Bill) -> bool {
+pub fn add_bill_to_db(conn: &Connection, bill: Bill) -> bool {
     match conn.execute(
         "INSERT INTO bills (name, total, category) VALUES (?1, ?2, ?3)",
         (&bill.name, &bill.total, &bill.category),
