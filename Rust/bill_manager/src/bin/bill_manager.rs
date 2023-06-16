@@ -21,20 +21,41 @@ fn get_input() -> io::Result<String> {
     Ok(buffer.trim().to_owned())
 }
 
-fn databaste_connection() -> Result<Connection, Error> {
+fn database_connection() -> Result<Connection, Error> {
+    // TODO - use dotenv to get db path
     let path = "./bills.db3";
-    println!("Connecting to database");
     Connection::open(path)
 }
 
 fn add_bill(conn: &Connection) {
-    if let Ok(bill) = add_prompt() {
-        add_bill_to_db(conn, bill);
+    loop {
+        println!("==========================================");
+        if let Ok(bill) = add_prompt() {
+            if add_bill_to_db(conn, bill) {
+                println!("Successfully added bill!")
+            } else {
+                println!("Failed to add bill")
+            }
+
+            println!("Add another bill?");
+            if let Ok(input) = get_input() {
+                loop {
+                    match input.as_str() {
+                        "y" | "Y" | "yes" | "YES" => break,
+                        "n" | "N" | "NO" | "no" => return,
+                        _ => {
+                            println!("Input not recognized, try again");
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 fn main() {
-    let db = match databaste_connection() {
+    let db = match database_connection() {
         Ok(conn) => {
             println!("Successfully connected to db");
             conn
@@ -46,8 +67,14 @@ fn main() {
         }
     };
 
-    // TODO - Only run create tables if they dont exist 
-    match create_table(&db);
+    match create_table(&db) {
+        Ok(_) => println!("Tables created"),
+        Err(e) => {
+            println!("Error creating tables");
+            println!("{}", e);
+            exit(1)
+        }
+    };
 
     loop {
         print_menu();
