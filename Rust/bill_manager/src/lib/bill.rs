@@ -65,3 +65,18 @@ pub fn view_bills(conn: &Connection) {
     }
     println!("================================================================");
 }
+
+fn total_bills(conn: &Connection) -> Result<f32, rusqlite::Error> {
+    let sql = format!("SELECT SUM({}) FROM {}", TOTAL_COL, TABLENAME);
+    let mut st = conn.prepare(sql.as_str())?;
+    st.query_row([], |row| row.get(0))
+}
+
+pub fn total_bills_prompt(conn: &Connection) {
+    println!("================================================================");
+    match total_bills(conn) {
+        Ok(tot) => println!("Your bill total is {}.", tot),
+        Err(_) => println!("Could not total your bills."),
+    };
+    println!("================================================================");
+}
