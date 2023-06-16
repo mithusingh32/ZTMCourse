@@ -1,8 +1,36 @@
 use crate::bill::Bill;
+use crate::utils::get_input;
 use rusqlite::Connection;
 use std::io;
 
-pub fn add_prompt() -> io::Result<Bill> {
+pub fn add_bill(conn: &Connection) {
+    loop {
+        println!("==========================================");
+        if let Ok(bill) = add_prompt() {
+            if add_bill_to_db(conn, bill) {
+                println!("Successfully added bill!")
+            } else {
+                println!("Failed to add bill")
+            }
+
+            println!("Add another bill?");
+            if let Ok(input) = get_input() {
+                loop {
+                    match input.as_str() {
+                        "y" | "Y" | "yes" | "YES" => break,
+                        "n" | "N" | "NO" | "no" => return,
+                        _ => {
+                            println!("Input not recognized, try again");
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn add_prompt() -> io::Result<Bill> {
     let mut name_buffer = String::new();
     let mut total_buffer = String::new();
     let mut category_buffer = String::new();
@@ -47,7 +75,7 @@ pub fn add_prompt() -> io::Result<Bill> {
     Ok(new_bill)
 }
 
-pub fn add_bill_to_db(conn: &Connection, bill: Bill) -> bool {
+fn add_bill_to_db(conn: &Connection, bill: Bill) -> bool {
     match conn.execute(
         "INSERT INTO bills (name, total, category) VALUES (?1, ?2, ?3)",
         (&bill.name, &bill.total, &bill.category),

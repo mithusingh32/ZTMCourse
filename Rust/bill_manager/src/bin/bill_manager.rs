@@ -1,8 +1,8 @@
-use bill_manager::add_bill::{add_bill_to_db, add_prompt};
-use bill_manager::db_utils::create_table;
+use bill_manager::add_bill::add_bill;
+use bill_manager::db_utils::{create_table, database_connection};
 use bill_manager::enums::Action;
-use rusqlite::{Connection, Error};
-use std::{io, process::exit};
+use bill_manager::utils::get_input;
+use std::process::exit;
 
 fn print_menu() {
     println!("== Manage Bills ==");
@@ -14,46 +14,6 @@ fn print_menu() {
     println!("q. Quit");
     println!("\nEnter Selection: ");
 }
-
-fn get_input() -> io::Result<String> {
-    let mut buffer = String::new();
-    io::stdin().read_line(&mut buffer)?;
-    Ok(buffer.trim().to_owned())
-}
-
-fn database_connection() -> Result<Connection, Error> {
-    // TODO - use dotenv to get db path
-    let path = "./bills.db3";
-    Connection::open(path)
-}
-
-fn add_bill(conn: &Connection) {
-    loop {
-        println!("==========================================");
-        if let Ok(bill) = add_prompt() {
-            if add_bill_to_db(conn, bill) {
-                println!("Successfully added bill!")
-            } else {
-                println!("Failed to add bill")
-            }
-
-            println!("Add another bill?");
-            if let Ok(input) = get_input() {
-                loop {
-                    match input.as_str() {
-                        "y" | "Y" | "yes" | "YES" => break,
-                        "n" | "N" | "NO" | "no" => return,
-                        _ => {
-                            println!("Input not recognized, try again");
-                            continue;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 fn main() {
     let db = match database_connection() {
         Ok(conn) => {
