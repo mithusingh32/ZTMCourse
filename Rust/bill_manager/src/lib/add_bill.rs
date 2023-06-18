@@ -13,7 +13,7 @@ pub fn add_bill(conn: &Connection) {
                 println!("Failed to add bill")
             }
 
-            println!("Add another bill?");
+            println!("Add another bill? [y/n]");
             if let Ok(input) = get_input() {
                 loop {
                     match input.as_str() {

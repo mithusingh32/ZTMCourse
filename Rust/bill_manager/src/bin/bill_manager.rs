@@ -1,6 +1,7 @@
 use bill_manager::add_bill::add_bill;
 use bill_manager::bill::{total_bills_prompt, view_bills};
 use bill_manager::db_utils::{create_table, database_connection};
+use bill_manager::delete_bills::delete_bill_prompt;
 use bill_manager::enums::Action;
 use bill_manager::utils::get_input;
 use std::process::exit;
@@ -63,7 +64,7 @@ fn main() {
         match action {
             Action::Add => add_bill(&db),
             Action::View => view_bills(&db),
-            Action::Remove => println!("Removing Bill"),
+            Action::Remove => delete_bill_prompt(&db),
             Action::Update => println!("Upating bill"),
             Action::Total => total_bills_prompt(&db),
             Action::Error => println!("Input incorect"),
