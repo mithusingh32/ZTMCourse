@@ -6,6 +6,7 @@ use crate::{
     utils::get_input,
 };
 
+/// Prompts the user, asking what bill to delete
 pub fn delete_bill_prompt(conn: &Connection) {
     view_bills(conn);
     println!("Enter the ID (Or all to delete all bills) of the bill to delete: ");
@@ -29,6 +30,7 @@ pub fn delete_bill_prompt(conn: &Connection) {
     }
 }
 
+/// Delete bill from the database
 fn delete_bill(conn: &Connection, id: i32) {
     let sql = format!("DELETE FROM {} WHERE {} = ?1;", TABLENAME, ID_COL);
     let mut st = conn.prepare(sql.as_str()).unwrap();

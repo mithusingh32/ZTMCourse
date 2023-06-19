@@ -3,6 +3,7 @@ use crate::utils::get_input;
 use rusqlite::Connection;
 use std::io;
 
+/// Prompt user and add bill into the database
 pub fn add_bill(conn: &Connection) {
     loop {
         println!("==========================================");
@@ -30,6 +31,7 @@ pub fn add_bill(conn: &Connection) {
     }
 }
 
+/// Logic to handle the user input for adding a bill
 fn add_prompt() -> io::Result<Bill> {
     let mut name_buffer = String::new();
     let mut total_buffer = String::new();
@@ -65,16 +67,17 @@ fn add_prompt() -> io::Result<Bill> {
     println!("\nCategory: ");
     io::stdin().read_line(&mut category_buffer)?;
 
-    let new_bill = Bill {
-        id: None,
-        name: name_buffer.trim().to_owned(),
-        total: total_buffer.trim().parse().unwrap(),
-        category: Some(category_buffer.trim().to_owned()),
-    };
+    let new_bill = Bill::new(
+        None,
+        name_buffer.trim().to_owned(),
+        Some(category_buffer.trim().to_owned()),
+        total_buffer.trim().parse().unwrap(),
+    );
 
     Ok(new_bill)
 }
 
+/// performs insert into database
 fn add_bill_to_db(conn: &Connection, bill: Bill) -> bool {
     match conn.execute(
         "INSERT INTO bills (name, total, category) VALUES (?1, ?2, ?3)",

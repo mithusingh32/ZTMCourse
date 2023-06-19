@@ -1,12 +1,14 @@
 use crate::constants::{CATEGORY_COL, ID_COL, NAME_COL, TABLENAME, TOTAL_COL};
 use rusqlite::{Connection, Error};
 
+/// Creates the database
 pub fn database_connection() -> Result<Connection, Error> {
     // TODO - use dotenv to get db path
     let path = "./bills.db3";
     Connection::open(path)
 }
 
+/// Creates the tables into the database if they don't exist
 pub fn create_table(conn: &Connection) -> Result<usize, Error> {
     let query = format!(
         "CREATE TABLE IF NOT EXISTS {} (
